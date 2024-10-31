@@ -1,0 +1,35 @@
+{
+  "organization": [
+    {
+      "key": "1",
+      "id": "1",
+      "name": "Najot Ta'lim",
+      "inn": "123456789",
+      "director": "Ali Zairov",
+      "address": "Tashkent , chilanzar 9kv",
+      "status": "true",
+      "createdAt": "2018-15-05"
+    },
+    {
+      "key": "2",
+      "id": "2",
+      "name": "Cambridge",
+      "inn": "145784561",
+      "director": "Jahongir Po'latov",
+      "address": "Tashkent , Yunusabad 8kv",
+      "status": "true",
+      "createdAt": "2014-23-02"
+    },
+    {
+      "id": "564a",
+      "name": "njebnj",
+      "inn": "1515",
+      "director": "jwenjd",
+      "address": "wekjbh",
+      "status": "false",
+      "createdAt": "2024-01-01"
+    }
+  ],
+  "students": [],
+  "administrator": []
+}

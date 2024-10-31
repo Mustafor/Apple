@@ -9,7 +9,7 @@ function App() {
         <Header/>
       <div className='flex '>
         <Navbar/>
-        <div className='w-[78%] h-[89]'>
+        <div className='w-[78%] h-[89vh]'>
           <CustomRoutes/>
         </div>
       </div>

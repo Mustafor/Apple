@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react'
 import PageInfo from '../components/PageInfo'
-import { Input, Select, Switch } from 'antd'
+import { Input, Modal, Select, Switch } from 'antd'
 import CustomTable from '../components/CustomTable'
-import { HTTP } from '../hook/useEnv'
-import axios from 'axios'
 import { DashOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import useDebounce from '../hook/useDebaunce'
+import {usePath} from '../hook/usePath'
+import {useAxios} from '../hook/useAxios'
+import { useNavigate } from 'react-router-dom'
 
 function Organization() {
   const [tBodyData, setTBodyData] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [refresh, setRefresh] = useState(false)
+  const [innData, setInnData] = useState([])
+  const navigate = useNavigate()
 
   const tHeadData = [
     {
       title: 'Id',
-      dataIndex: 'id',
+      dataIndex: 'key',
     },
     {
       title: 'Nomi',
@@ -47,6 +50,7 @@ function Organization() {
     },
   ]
 
+  // Search start
   const [searchData, setSearchData] = useState("")
   function handleSearchOrganization(e) {
     setIsLoading(true)
@@ -64,42 +68,85 @@ function Organization() {
       setTBodyData(filteredData)
     }
   }, [searchByName])
+  // Search end
 
+  // INN start
+  const [innId, setInnId] = useState("")
+  function handleInnSelectChange(e){
+    setIsLoading(true)
+    setTimeout(() => setInnId(e), 1000)
+  }
+  // INN end
+
+  // Delete start
+  const [deleteModal, setDeleteModal] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
+
+  function handleDelete(id){
+    setDeleteModal(true)
+    setDeleteId(id)
+  }
+
+  function handleSureDelete(){
+    setDeleteModal(false)
+    setIsLoading(true)
+    useAxios().delete(`/organization/${deleteId}`).then(res => {
+      setTimeout(() => {
+        setIsLoading(false)
+        setRefresh(!refresh)
+      }, 1000)
+    })
+  }
+  // Delete end
+  
+  // Get all start
   useEffect(() => {
-    axios(`${HTTP}/organization`).then(res => {
+    useAxios().get(`/organization?=${innId ? innId : ""}`).then(res => {
       setIsLoading(false)
-      setTBodyData(res.data.map(item => {
+      setTBodyData(res.data.map((item, index) => {
         item.action = <div className='flex items-center gap-5'>
-          <DashOutlined className='hover:scale-[2] duration-300 cursor-pointer hover:text-blue-500'/>
+          <DashOutlined onClick={() => navigate(`${item.id}`)} className='hover:scale-[2] duration-300 cursor-pointer hover:text-blue-500'/>
           <EditOutlined className='hover:scale-[2] duration-300 cursor-pointer hover:text-green-500'/>
-          <DeleteOutlined className='hover:scale-[2] duration-300 cursor-pointer hover:text-red-500'/>
+          <DeleteOutlined onClick={() => handleDelete(item.id)} className='hover:scale-[2] duration-300 cursor-pointer hover:text-red-500'/>
         </div>
+        item.key = index + 1
         item.status = <Switch defaultChecked={JSON.parse(item.status)}/>
         return item
       }))
     })
-  }, [refresh])
+  }, [refresh, innId])
+
+  useEffect(() => {
+    useAxios().get("/organization").then(res => {
+      setInnData(res.data.map(item => {
+         return {
+          label:`INN: ${item.inn}`,
+          value:item.id
+        }
+      }))
+    })
+  }, [])
+  // Get all end
+  
 
   return (
     <div className='p-5'>
-      <PageInfo btnTitle={"Qo'shish"} title={"Tahskilotlar"} subtitle={"tahskilotlar"} count={5}/>
+      <PageInfo addPath={usePath.organizationAdd} btnTitle={"Qo'shish"} title={"Tahskilotlar"} subtitle={"tahskilotlar"} count={5}/>
       <div className='my-5 flex items-center gap-5'>
         <Input onChange={handleSearchOrganization} className='w-[300px] ' allowClear placeholder='Qidirish...' type='text' size='large'/>
         <Select
+        onChange={handleInnSelectChange}
         className='w-[300px]'
         showSearch
+        allowClear
         placeholder="INN bo'yicha tanlang"
         size='large'
         optionFilterProp='label'
-        options={[
-          {
-            value: 'jack',
-            label: 'Jack',
-          }
-        ]}
+        options={innData}
         />
       </div>
       <CustomTable isLoading={isLoading} tHead={tHeadData} tBody={tBodyData}/>
+      <Modal onOk={handleSureDelete} title="O'chirilsinmi?" open={deleteModal} onCancel={() => setDeleteModal(false)}/>
     </div>
   )
 }

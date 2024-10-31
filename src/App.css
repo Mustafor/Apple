@@ -10,6 +10,14 @@
     background-color: var(--bg-clr) !important;
 }
 
+.ant-btn > span{
+    color: white !important;
+}
+
+.ant-btn:hover{
+    border-color: var(--bg-clr) !important;
+}
+
 .ant-scroll-number{
     background-color: var(--bg-clr) !important;
 }
@@ -20,5 +28,13 @@
 
 .ant-spin-dot-holder{
     color: var(--bg-clr) !important;
+}
+
+.delete-btn{
+    background-color: red !important;
+}
+
+.update-btn{
+    background-color: blue !important;
 }
 

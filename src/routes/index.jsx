@@ -9,6 +9,7 @@ function CustomRoutes() {
     <Routes>
         <Route path={usePath.organization} element={<Organization/>}/>
         <Route path={usePath.organizationAdd} element={<OrganizationAdd/>}/>
+        <Route path={usePath.organizationEdit} element={<OrganizationAdd/>}/>
         <Route path={usePath.OrganizationMore} element={<OrganizationMore/>}/>
         <Route path={usePath.admin} element={<Administrator/>}/>
         <Route path={usePath.students} element={<Students/>}/>

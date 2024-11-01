@@ -2,41 +2,64 @@ import { AppstoreAddOutlined, ArrowDownOutlined, ArrowLeftOutlined, LoadingOutli
 import { Button, Checkbox, DatePicker, Input } from 'antd'
 import axios from 'axios'
 import dayjs from 'dayjs'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { HTTP } from '../hook/useEnv'
 import toast, { Toaster } from 'react-hot-toast'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useAxios } from '../hook/useAxios'
 
 function OrganizationAdd() {
+  const { id } = useParams()
   const navigate = useNavigate()
+  const date = new Date()
   const [name, setName] = useState("")
   const [inn, setInn] = useState("")
   const [director, setDirector] = useState("")
   const [address, setAddress] = useState("")
-  const [createdAt, setCreatedAt] = useState("2024-01-01")
+  const [createdAt, setCreatedAt] = useState(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, 0)}-${String(date.getDate()).padStart(2, 0)}`)
   const [status, setStatus] = useState("")
+  const [isLoading, setIsLoading] = useState(false)  
+
   const dateFormat = 'YYYY-MM-DD';
-  const [isLoading, setIsLoading] = useState(false)
+
 
   function handleAddOrganization(e){
     e.preventDefault()
     setIsLoading(true)
-    const data = {
-      name,
-      inn,
-      director,
-      address,
-      status,
-      createdAt
+    const data = { name, inn, director, address, status, createdAt }
+    if(id){
+      data.id = id
+      axios.put(`${HTTP}/organization/${id}`, data).then(res => {
+        setTimeout(() => {
+          toast.success("Muvaffaqiyatli!")
+          setIsLoading(false)
+          navigate(-1)
+        }, 1000)
+      })
     }
-    axios.post(`${HTTP}/organization`, data).then(res => {
-      setTimeout(() => {
-        toast.success("Muvaffaqiyatli!")
-        setIsLoading(false)
-        navigate(-1)
-      }, 1000)
-    })
+    else{
+      axios.post(`${HTTP}/organization`, data).then(res => {
+        setTimeout(() => {
+          toast.success("Muvaffaqiyatli!")
+          setIsLoading(false)
+          navigate(-1)
+        }, 1000)
+      })
+    }
   }
+
+  useEffect(() => {
+    if(id){
+      useAxios().get(`/organization/${id}`).then(res => {
+        setName(res.data.name)
+        setInn(res.data.inn)
+        setDirector(res.data.director)
+        setAddress(res.data.address)
+        setStatus(res.data.status)
+        setCreatedAt(res.data.createdAt)
+      })
+    }
+  }, [])
 
   return (
     <form onSubmit={handleAddOrganization} className='p-5'>
@@ -44,9 +67,9 @@ function OrganizationAdd() {
       <div className='flex items-center space-y-5 justify-between'>
         <div className='flex items-center space-x-5'>
           <ArrowLeftOutlined onClick={() => navigate(-1)} className='scale-[1.5] cursor-pointer'/>
-          <h2 className='font-bold text-[22px]'>Tashkilot qoshish</h2>
+          <h2 className='font-bold text-[22px]'>Tashkilot {id ? "tahrirlash" : "qoshish"}</h2>
         </div>
-        <Button htmlType='submit' icon={isLoading ? <LoadingOutlined/> : <AppstoreAddOutlined/>} type='primary' size='large'>Saqlash</Button>
+        <Button htmlType='submit' icon={isLoading ? <LoadingOutlined/> : <AppstoreAddOutlined/>} type='primary' size='large'>{id ? "Tahrirlash" : "Saqlash"}</Button>
       </div>
       <div className='mb-5 flex justify-between w-[70%]'>
         <div className='w-[49%] space-y-5 p-5 border-[1px] border-slate-400 rounded-md'>
@@ -70,7 +93,7 @@ function OrganizationAdd() {
           </label>
           <label className='flex flex-col'>
             <span className='text-[15px] mb-1 text-slate-400'>Yaratilgan vaqt</span>
-            <DatePicker value={dayjs(createdAt, dateFormat)} onChange={(a,b) => setCreatedAt(b)} size='large' placeholder='Vaqt kirting' />
+            <DatePicker value ={dayjs(createdAt, dateFormat)} onChange={(a,b) => setCreatedAt(b)} size='large' placeholder='Vaqt kirting' />
           </label>
           <label className='flex flex-col'>
             <span className='text-[15px] mb-1 text-slate-400'>Holati</span>

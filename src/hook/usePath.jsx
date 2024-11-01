@@ -4,5 +4,8 @@ export const usePath = {
     students:"/students",
     admin:"/admin",
     organizationAdd:"/organization/add",
-    OrganizationMore:"/organization/:id"
+    OrganizationMore:"/organization/:id",
+    organizationEdit:"/edit/:id",
+    signIn:"/",
+    signUp:"/sign-up"
 }
